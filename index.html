@@ -1,1 +1,940 @@
-A
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8"> 
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>School Ghost Stories — Ver.1: The Curse of Kokkuri-san</title>
+
+<style>
+
+* {
+
+  box-sizing: border-box;
+
+}
+
+body {
+
+  margin: 0;
+
+  background: #000;
+
+  color: #fff;
+
+  font-family: "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif;
+
+  overflow: hidden;
+
+}
+
+.screen {
+
+  display: none;
+
+  position: relative;
+
+  width: 100vw;
+
+  height: 100dvh;
+
+  background: #000;
+
+}
+
+.screen.active {
+
+  display: flex;
+
+}
+
+#titleScreen {
+
+  align-items: center;
+
+  justify-content: center;
+
+}
+
+.full-image {
+
+  width: 100%;
+
+  height: 100%;
+
+  object-fit: contain;
+
+}
+
+
+
+@keyframes blink {
+
+  0%,100% { opacity: 1; }
+
+  50% { opacity: .35; }
+
+}
+
+#warningScreen {
+
+  padding: 30px 22px;
+
+  align-items: center;
+
+  justify-content: center;
+
+  text-align: center;
+
+}
+
+.warning-box {
+
+  max-width: 600px;
+
+  line-height: 1.9;
+
+  font-size: 16px;
+
+}
+
+.warning-title {
+
+  font-size: 22px;
+
+  margin-bottom: 22px;
+
+}
+
+button {
+
+  margin-top: 24px;
+
+  padding: 14px 28px;
+
+  border: 1px solid #aaa;
+
+  border-radius: 4px;
+
+  background: #111;
+
+  color: #fff;
+
+  font-size: 17px;
+
+}
+
+#storyScreen {
+
+  flex-direction: column;
+
+  justify-content: center;
+
+  align-items: center;
+
+}
+
+#storyImage {
+
+  width: 100%;
+
+  height: 100%;
+
+  object-fit: cover;
+
+}
+
+#textBox {
+
+  position: absolute;
+
+  left: 0;
+
+  right: 0;
+
+  bottom: 0;
+
+  min-height: 25%;
+
+  padding: 18px 20px 30px;
+
+  background: rgba(0,0,0,.72);
+
+  font-size: 17px;
+
+  line-height: 1.7;
+
+  white-space: pre-line;
+
+}
+
+#nextMark {
+
+  position: absolute;
+
+  right: 18px;
+
+  bottom: 8px;
+
+  font-size: 18px;
+
+  animation: blink 1.2s infinite;
+
+}
+.shake {
+
+  animation: shake 0.08s infinite;
+
+}
+
+@keyframes shake {
+
+  0%   { transform: translate(0, 0); }
+
+  25%  { transform: translate(-4px, 2px); }
+
+  50%  { transform: translate(4px, -2px); }
+
+  75%  { transform: translate(-3px, -2px); }
+
+  100% { transform: translate(3px, 2px); }
+
+}
+</style>
+
+</head>
+
+<body>
+
+<section id="titleScreen" class="screen active">
+
+  <img src="01_title_en.PNG" class="full-image" alt="">
+
+</section>
+
+<section id="warningScreen" class="screen">
+
+  <div class="warning-box">
+
+  <div class="warning-title">— WARNING —</div>
+
+This game is a work of fiction. <br>
+
+It contains horror elements based on "Kokkuri-san."
+
+Please do not attempt or imitate Kokkuri-san in real life.
+
+This game also contains dark visual effects, sound effects, and frightening scenes. <br>
+
+Viewer discretion is advised. <br><br>
+
+If you are ready, proceed. <br>
+
+<button id="startButton">START GAME</button>
+
+  </div>
+
+</section>
+
+<section id="storyScreen" class="screen">
+
+  <img id="storyImage" src="" alt="">
+
+  <div id="textBox">
+
+    <span id="storyText"></span>
+
+    <span id="nextMark">▼</span>
+
+  </div>
+
+</section>
+
+<audio id="schoolChime" preload="auto">
+
+  <source src="school_chime_base.wav" type="audio/wav">
+
+</audio>
+
+<script>
+
+const titleScreen = document.getElementById("titleScreen");
+
+const warningScreen = document.getElementById("warningScreen");
+
+const storyScreen = document.getElementById("storyScreen");
+
+const storyImage = document.getElementById("storyImage");
+
+const storyText = document.getElementById("storyText");
+
+const schoolChime = document.getElementById("schoolChime");
+
+let currentScene = 0;
+
+const scenes = [
+
+  {
+
+    image: "02_school_morning.PNG",
+
+    text: "It was a morning like any other.",
+
+    chime: true
+
+  },
+
+  {
+
+    image: "03_shoebox.PNG",
+
+  text: "Students arrive at school one after another.\nAnother ordinary day begins.",
+
+  },
+
+  { 
+
+    image: "04_hallway.PNG",
+
+  text: "Voices and laughter echoed through the hallway as friends talked.",
+
+  },
+
+  {
+
+    image: "05_stairs_day.PNG",
+
+  text: "The familiar staircase we go up and down every day.",
+
+  },
+
+  {
+
+    image: "06_classroom_day.PNG",
+
+  text: "Break time. Friends could be heard chatting throughout the classroom.",
+
+  },
+
+  {
+
+    image: "07_artroom_day.PNG",
+
+  text: "In the art room, students were drawing pictures.",
+
+  },
+
+  {
+
+    image: "08_scienceroom_day.PNG",
+
+  text: "The science room.\nAn old skeleton model stood against the wall.",
+
+  },
+
+  {
+
+    image: "08b_skeleton_day.PNG",
+
+  text: "Looking closely... its left hand is missing.\nIt seems to have been left broken like this for a long time.",
+
+  },
+
+  {
+
+    image: "09_musicroom_day.PNG",
+
+  text: "From the music room, someone could be heard practicing the piano.",
+
+  },
+
+  {
+
+    image: "06_classroom_day.PNG",
+
+  text: "And then, after school—.",
+
+  },
+
+  {
+
+    image: "06_classroom_day.PNG",
+
+  text: "Why don't we try an old game that used to be popular after school today?",
+
+  },
+
+  {
+
+    image: "06_classroom_day.PNG",
+
+  text: "An old game?",
+
+  },
+
+  {
+
+    image: "10_kokkuri_day.PNG",
+
+  text: "Kokkuri-san.",
+
+  },
+
+  {
+
+    image: "10_kokkuri_day.PNG",
+
+  text: "The four of them gathered around the desk.\nThey placed a 10-yen coin on the paper.",
+
+  },
+
+  {
+
+    image: "10_kokkuri_day.PNG",
+
+  text: ".........",
+
+  },
+
+  {
+
+    image: "10_kokkuri_day.PNG",
+
+  text: "The 10-yen coin didn't move at all.",
+
+  },
+
+  {
+
+    image: "10_kokkuri_day.PNG",
+
+  text: "\"See? It's just a superstition.\"",
+
+  },
+
+  {
+
+    image: "10_kokkuri_day.PNG",
+
+  text: "Then one of the boys said with a laugh.",
+
+  },
+
+  {
+
+    image: "10_kokkuri_day.PNG",
+
+  text: "\"Then why don't the four of us get together and try it tonight?\""
+
+  },  
+  {
+
+    image: "11_school_night.PNG",
+
+  text: "—And then, night."
+
+  },
+
+  {
+
+    image: "11_school_night.PNG",
+
+  text: "\"Hey! Are we really okay being at school this late? Don't blame me if something happens!\""
+
+  },
+
+  {
+
+    image: "11_school_night.PNG",
+
+  text: "\"Come on, it's fine~ Are you scared already?\""
+
+  },
+
+  {
+
+    image: "11_school_night.PNG",
+
+  text: "\"I'm not scared! Come on, let's go.\""
+
+  },
+
+  {
+
+    image: "11_school_night.PNG",
+
+  text: "\"Let's see what this Kokkuri-san can really do!\""
+
+  },
+
+  {
+
+    image: "12_kokkuri_night.PNG",
+
+  text: "The four of them placed their fingers on the 10-yen coin once again."
+
+  },
+
+  {
+
+    image: "12_kokkuri_night.PNG",
+
+  text: "\"Kokkuri-san, Kokkuri-san. If you are here, please move to 'YES'.\""
+
+  },
+
+  {
+
+    image: "12_kokkuri_night.PNG",
+
+    text: "…………。"
+
+  },
+
+  {
+
+    image: "13_kokkuri_yes.PNG",
+
+  text: "The 10-yen coin moved.",
+coinSound: true
+  },
+{
+
+  image: "12_kokkuri_night.PNG",
+
+text: "\"Kokkuri-san, Kokkuri-san.\nPlease return to the torii gate.\""
+
+},
+
+{
+
+  image: "12_kokkuri_night.PNG",
+
+text: "The 10-yen coin slowly returned to the torii gate.",
+coinSound: true
+},
+
+{
+
+  image: "12_kokkuri_night.PNG",
+
+  text: "…………。"
+
+},
+  
+
+{
+
+  image: "12_kokkuri_night.PNG",
+
+text: "……No one had asked anything.\n\nThen――the 10-yen coin began to move on its own.",
+
+},
+
+{
+
+  image: "14_kokkuri_chi.PNG",
+
+  text: "Y……O……U……"
+
+},
+{
+
+    image: "14_kokkuri_chi.PNG",
+
+    text: "\"I'm scared now... let's stop.\"\n\n\"Come on, seriously...\""
+
+},
+{
+
+    image: "12_kokkuri_night.PNG",
+
+    text: "\"Kokkuri-san, Kokkuri-san.\nPlease return to the torii gate.\""
+
+},
+
+{
+
+    image: "12_kokkuri_night.PNG",
+
+  text: "The 10-yen coin slowly returned to the torii gate.",
+
+    coinSound: true
+
+},
+  {
+
+    image: "12_kokkuri_night.PNG",
+
+  text: "\"Kokkuri-san, Kokkuri-san.\nPlease return home.\""
+
+},
+
+{
+
+    image: "15_kokkuri_no.PNG",
+
+    text: "……NO",
+
+    coinSound: true
+
+},{
+
+    image: "15_kokkuri_no.PNG",
+
+  text: "……NO",
+
+    coinSound: true
+
+},
+{image:"15_kokkuri_no.PNG", 
+  text: "…………NO",
+coinSound: true,
+ scaryNo: true
+  },
+
+{
+
+  image: "12_kokkuri_night.PNG",
+
+  text: "Everyone! Run! We have to get out of here—now!!"
+
+},
+
+{
+
+  image: "16_toilet_night.PNG",
+
+  text: "\"No! This isn't it!\"\n\nBefore they knew it, the four of them were standing in front of an empty restroom.",
+
+},
+
+{
+
+  image: "16_toilet_night.PNG",
+
+  text: "Drip……",
+waterDrop: true
+},
+  {
+
+  image: "17_toilet_door.PNG",
+
+  text: "Knock……Knock……Knock……",
+
+  threeKnocks: true
+
+},{
+
+  image: "18_stairs_night.PNG",
+
+  text: "10……11……12……",
+stairFootsteps: true
+},{
+
+  image: "18_stairs_night.PNG",
+
+  text: "……13？"
+
+},{
+
+  image: "19_stairs_figure.PNG",
+
+  text: "……Was someone up there just now?"
+
+},
+{
+
+  image: "20_science_night.PNG",
+
+text: "No! This isn't the place!"
+
+},
+{
+
+  image: "20_science_night.PNG",
+
+  text: "……Huh? The skeleton model's left hand... is it back?"
+
+},
+{
+
+  image: "21_skeleton_closeup.PNG",
+
+  text: "……Look at the skeleton model again",
+boneClick: true
+},
+
+{
+
+  image: "22_music_night.PNG",
+
+text: "No! This isn't the place!",
+pianoSound: true
+},
+{
+
+  image: "23_beethoven.PNG?v=2",
+
+  text: "……Look at the portrait"
+
+},
+
+
+
+{
+
+  image: "24_four_corners.PNG",
+
+  text: "……Before they knew it, they were back in the classroom."
+
+},
+{
+
+  image: "25_four_corners_dark.PNG",
+
+text: "……Someone is walking.",
+fourCornersSound: true
+},
+{
+
+  image: "26_final_yes_coin.PNG",
+
+  text: "……",
+chime: true
+},
+  {
+
+  image: "26_final_yes_coin.PNG",
+
+  text: "……The chime?"
+
+},
+
+{
+
+  image: "26_final_yes_coin.PNG",
+
+  text: "Could it be... can we get out?"
+
+},
+{
+
+  image: "27_classroom_door.PNG",
+
+  text: "Try opening the door"
+},   
+{
+
+  image: "27_classroom_door.PNG",
+
+  text: "Click……\n\nThe door opened.\n\n……We can get out."
+
+},
+{
+
+  image: "27_classroom_door.PNG",
+
+  text: "— One Last Note —\n\nThis work is fiction.\nThe events and supernatural phenomena depicted in this story are fictional elements created for dramatic effect.\n\nPlease do not actually perform or imitate Kokkuri-san.\n\nThis story ends here.\n\n……Please enjoy school ghost stories\nonly within the world of fiction."
+
+},
+{
+
+  image: "27_classroom_door.PNG",
+
+  text: "Created by: 恋する魔女\n\nProgramming: ChatGPT\n\nGraphics: ChatGPT\n\nAssistance: ChatGPT"
+
+
+},
+
+{
+
+  image: "27_classroom_door.PNG",
+
+  text: "The End"
+
+}
+
+];
+  
+
+
+
+
+
+
+
+
+  const coinSlideSound = new Audio("01_coin_slide.wav");
+
+coinSlideSound.preload = "auto";
+
+const waterDropSound = new Audio("water_drop_candidate_1.wav");
+
+waterDropSound.preload = "auto";
+ const threeKnocksSound = new Audio("03_three_knocks.wav");
+
+threeKnocksSound.preload = "auto";
+const stairFootstepsSound = new Audio("04_stair_footsteps.wav");
+
+stairFootstepsSound.preload = "auto";
+ const scienceScrapeSound = new Audio("05_science_scrape.wav");
+
+scienceScrapeSound.preload = "auto"; 
+const boneClickSound = new Audio("06_bone_click.wav");
+
+boneClickSound.preload = "auto";  
+const pianoSound = new Audio("07_piano_single_note.wav");
+
+pianoSound.preload = "auto";
+ const fourCornersSound = new Audio("08_four_corners_steps_and_tap.wav");
+
+fourCornersSound.preload = "auto"; 
+const doorUnlockSound = new Audio("09_door_unlock.wav");
+
+doorUnlockSound.preload = "auto";
+  
+titleScreen.addEventListener("click", () => {
+
+  titleScreen.classList.remove("active");
+
+  warningScreen.classList.add("active");
+
+});
+
+document.getElementById("startButton").addEventListener("click", (event) => {
+
+  event.stopPropagation();
+
+  warningScreen.classList.remove("active");
+
+  storyScreen.classList.add("active");
+
+  currentScene = 0;
+
+  showScene();
+
+});
+
+function showScene() {
+
+  const scene = scenes[currentScene];
+
+  storyImage.src = scene.image;
+
+  storyText.textContent = scene.text;
+storyText.style.color = "";
+
+storyText.classList.remove("shake");
+  if (scene.chime) {
+
+    schoolChime.currentTime = 0;
+
+    schoolChime.play().catch(() => {});
+}
+  if (scene.coinSound) {
+
+    coinSlideSound.currentTime = 0;
+
+    coinSlideSound.play().catch(() => {});
+
+}
+  if (scene.waterDrop) {
+
+    waterDropSound.currentTime = 0;
+
+    waterDropSound.play().catch(() => {});
+
+}
+if (scene.threeKnocks) {
+
+    threeKnocksSound.currentTime = 0;
+
+    threeKnocksSound.play().catch(() => {});
+
+}
+  if (scene.stairFootsteps) {
+
+    stairFootstepsSound.currentTime = 0;
+
+    stairFootstepsSound.play().catch(() => {});
+
+}
+  if (scene.scienceScrape) {
+
+  scienceScrapeSound.currentTime = 0;
+
+  scienceScrapeSound.play().catch(() => {});
+}
+ if (scene.boneClick) {
+
+    boneClickSound.currentTime = 0;
+
+    setTimeout(() => {
+
+        boneClickSound.play().catch(() => {});
+
+    }, 800);
+
+}
+  if (scene.pianoSound) {
+
+    pianoSound.currentTime = 0;
+
+    setTimeout(() => {
+
+        pianoSound.play().catch(() => {});
+
+    }, 500);
+
+}
+if (scene.fourCornersSound) {
+
+    fourCornersSound.currentTime = 0;
+
+    fourCornersSound.play().catch(() => {});
+
+}
+
+
+
+  if (scene.scaryNo) {
+
+  storyText.style.color = "red";
+
+  storyText.classList.add("shake");
+
+}
+}
+storyScreen.addEventListener("click", () => {
+
+    if (currentScene === scenes.length - 1) {
+
+        doorUnlockSound.currentTime = 0;
+
+        doorUnlockSound.play().catch(() => {});
+
+        
+
+    }
+
+    if (currentScene < scenes.length - 1) {
+
+        currentScene++;
+
+        showScene();
+
+    }
+
+});
+
+
+</script>
+
+</body>
+
+</html>
